@@ -1,12 +1,30 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
+  mode: process.env.NODE_ENV,
   entry: './client/index.js',
   output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, '/dist'),
+  },
+  plugins: [
+    new HTMLWebpackPlugin({
+      filename: 'index.html',
+      template: path.resolve(__dirname, './client/index.html'),
+    }),
+  ],
+  devServer: {
+    port: 8080,
+    proxy: {
+      '/api': 'http://localhost:3000',
+    },
+    hot: true,
+    historyApiFallback: true,
+    static: {
+      publicPath: '/dist',
+      directory: path.resolve(__dirname, '/dist'),
+    },
   },
   module: {
     rules: [
@@ -26,19 +44,6 @@ module.exports = {
       },
     ],
   },
-  devServer: {
-    proxy: {
-      '/test': {
-        target: 'http://localhost:3000/',
-      },
-    },
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.resolve(__dirname, './public/index.html'),
-    }),
-  ],
   resolve: {
     extensions: ['.js'],
   },
